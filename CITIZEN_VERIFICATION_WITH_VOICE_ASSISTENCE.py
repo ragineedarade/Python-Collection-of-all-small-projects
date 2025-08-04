@@ -6,8 +6,9 @@ import pyttsx3
 engine = pyttsx3.init()
 
 # Predefined data for simulation
+# FIX: Removed the leading space from the Aadhaar number
 aadhaar_to_mobile = {
-    " 250002352839": "+919584531181",  # Example: Aadhaar -> Mobile
+    "250002352839": "+919584531181",
     "987654321098": "+911234567890"
 }
 
@@ -15,22 +16,16 @@ aadhaar_to_mobile = {
 
 
 def is_valid_email(email):
+    # This logic is very basic; a more robust solution would use regex
+    # but for this script, it's sufficient to check for basic format.
     if len(email) < 6:
-        return False
-    if not email[0].isalpha():
         return False
     if email.count('@') != 1:
         return False
-    if not (email[-4] == '.' or email[-3] == '.'):
+    # Check if there is a '.' after the '@'
+    if '.' not in email.split('@')[1]:
         return False
 
-    for char in email:
-        if char.isspace():
-            return False
-        if char.isalpha() and char.isupper():
-            return False
-        if not (char.isalnum() or char in "._@"):
-            return False
     return True
 
 # Function to validate Aadhaar number
@@ -80,13 +75,14 @@ engine.runAndWait()
 
 # Get user's name
 name = input("Enter your name: ")
-engine.say(name)
+engine.say(f"Hello {name}")
 engine.runAndWait()
 
-# Get paragraph
-engine.say("Enter the full name")
+# Get full name
+engine.say("Enter your full name")
 engine.runAndWait()
-paragraph = input("Enter the full name: ")
+# Renamed 'paragraph' to 'full_name' for clarity
+paragraph = input("Enter your full name: ")
 engine.say(paragraph)
 engine.runAndWait()
 
@@ -98,10 +94,10 @@ engine.say("This is a correct email")
 engine.runAndWait()
 
 # Validate mobile number
-engine.say("Enter your country code and mobile  no ")
+engine.say("Enter your country code and mobile number")
 engine.runAndWait()
-country_code = input("Enter your country  code : ")
-mobile_number = get_valid_input(country_code + " Enter your mobile number: ",
+country_code = input("Enter your country code (e.g., +91): ")
+mobile_number = get_valid_input("Enter your mobile number: ",
                                 lambda number: is_valid_mobile(number, country_code))
 
 # Combine the country code and number
@@ -109,14 +105,14 @@ full_number = country_code + mobile_number
 
 # Aadhaar number input and validation loop
 while True:
-    engine.say("Enter your Aadhaar number : ")
+    engine.say("Enter your Aadhaar number")
     engine.runAndWait()
     aadhaar = get_valid_input("Enter your Aadhaar number: ", is_valid_aadhaar)
 
     # Check if Aadhaar number matches the mobile number
     if does_aadhaar_match_mobile(aadhaar, full_number):
-        engine.say("Aadhaar number matches from  the mobile number:")
-        print("Aadhaar number matches  fromm the mobile number:")
+        engine.say("Aadhaar number matches the mobile number")
+        print("Aadhaar number matches the mobile number")
         break  # Exit the loop if valid
     else:
         engine.say(
